@@ -7,7 +7,16 @@ const Navbar = () => {
 
   const [showMenu, setShowMenu] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [token, setToken] = useState(true); // token  ? login : logout
+  const [token, setToken] = useState(true); // token ? login : logout
+
+  const toggleDropdown = (e) => {
+    e.stopPropagation(); // Prevent event bubbling
+    setShowDropdown((prev) => !prev);
+  };
+
+  const closeDropdown = () => {
+    setShowDropdown(false);
+  };
 
   return (
     <div className="flex items-center justify-between text-sm py-4 mb-5 border-b border-b-gray-400">
@@ -20,40 +29,54 @@ const Navbar = () => {
       <ul className="hidden md:flex items-start gap-5 font-medium">
         <NavLink to="/">
           <li className="py-1">Home</li>
-          <hr className="border-none  outline-none h-0.5 bg-primary w-3/5 m-auto hidden" />
+          <hr className="border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden" />
         </NavLink>
         <NavLink to="/doctors">
           <li className="py-1">All Doctors</li>
-          <hr className="border-none  outline-none h-0.5 bg-primary w-3/5 m-auto hidden" />
+          <hr className="border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden" />
         </NavLink>
         <NavLink to="/about">
           <li className="py-1">About</li>
-          <hr className="border-none  outline-none h-0.5 bg-primary w-3/5 m-auto hidden" />
+          <hr className="border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden" />
         </NavLink>
         <NavLink to="/contact">
           <li className="py-1">Contact</li>
-          <hr className="border-none  outline-none h-0.5 bg-primary w-3/5 m-auto hidden" />
+          <hr className="border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden" />
         </NavLink>
       </ul>
 
       <div className="flex items-center gap-4">
         {token ? (
-          <div className="flex items-center gap-2 cursor-pointer group relative">
+          <div className="relative flex items-center gap-2 cursor-pointer group">
             <img
               src={assets.profile_pic}
               alt="profile-icon"
               className="w-8 rounded-full"
-              onClick={() => setShowDropdown(prev => !prev)}
+              onClick={(e) => {
+                if (window.innerWidth < 768) toggleDropdown(e); // Toggle only on mobile
+              }}
             />
             <img
               src={assets.dropdown_icon}
               alt="dropdown-icon"
               className="w-2.5"
-              onClick={() => setShowDropdown(prev => !prev)}
+              onClick={(e) => {
+                if (window.innerWidth < 768) toggleDropdown(e); // Toggle only on mobile
+              }}
             />
+            {showDropdown && (
+              <div
+                className="fixed inset-0 z-10 md:hidden"
+                onClick={closeDropdown}
+              ></div>
+            )}
             <div
-              className={`absolute top-0 right-0 pt-14 text-base font-medium text-gray-600 z-20 
-              ${showDropdown ? "block" : "hidden"} md:block group-hover:block`}
+              className={`absolute top-0 right-0 pt-14 text-base font-medium text-gray-600 z-20  
+                ${
+                  showDropdown && window.innerWidth < 768
+                    ? "block md:hidden"
+                    : "hidden md:group-hover:block"
+                }`}
             >
               <div className="min-w-48 bg-stone-100 rounded flex flex-col gap-4 p-4 shadow-md">
                 <p
@@ -93,13 +116,6 @@ const Navbar = () => {
           >
             Create Account
           </button>
-        )}
-
-        {showDropdown && (
-          <div
-            className="fixed inset-0 z-10"
-            onClick={() => setShowDropdown(false)}
-          ></div>
         )}
 
         {/*---------Mobile Menu----------*/}
