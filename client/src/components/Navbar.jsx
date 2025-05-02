@@ -6,6 +6,7 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const [showMenu, setShowMenu] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
   const [token, setToken] = useState(true); // token  ? login : logout
 
   return (
@@ -42,28 +43,42 @@ const Navbar = () => {
               src={assets.profile_pic}
               alt="profile-icon"
               className="w-8 rounded-full"
+              onClick={() => setShowDropdown(prev => !prev)}
             />
             <img
               src={assets.dropdown_icon}
               alt="dropdown-icon"
               className="w-2.5"
+              onClick={() => setShowDropdown(prev => !prev)}
             />
-            <div className="absolute top-0 right-0 pt-14 text-base font-medium text-gray-600 z-20 hidden group-hover:block">
-              <div className="min-w-48 bg-stone-100 rounded flex flex-col gap4 p-4">
+            <div
+              className={`absolute top-0 right-0 pt-14 text-base font-medium text-gray-600 z-20 
+              ${showDropdown ? "block" : "hidden"} md:block group-hover:block`}
+            >
+              <div className="min-w-48 bg-stone-100 rounded flex flex-col gap-4 p-4 shadow-md">
                 <p
                   className="hover:text-black cursor-pointer"
-                  onClick={() => navigate("/my-profile")}
+                  onClick={() => {
+                    navigate("/my-profile");
+                    setShowDropdown(false);
+                  }}
                 >
                   My Profile
                 </p>
                 <p
                   className="hover:text-black cursor-pointer"
-                  onClick={() => navigate("/my-appointments")}
+                  onClick={() => {
+                    navigate("/my-appointments");
+                    setShowDropdown(false);
+                  }}
                 >
                   My Appointments
                 </p>
                 <p
-                  onClick={() => setToken(false)}
+                  onClick={() => {
+                    setToken(false);
+                    setShowDropdown(false);
+                  }}
                   className="hover:text-black cursor-pointer"
                 >
                   Logout
@@ -79,6 +94,51 @@ const Navbar = () => {
             Create Account
           </button>
         )}
+
+        {showDropdown && (
+          <div
+            className="fixed inset-0 z-10"
+            onClick={() => setShowDropdown(false)}
+          ></div>
+        )}
+
+        {/*---------Mobile Menu----------*/}
+        <img
+          src={assets.menu_icon}
+          alt="menu-icon"
+          onClick={() => setShowMenu(true)}
+          className="w-6 md:hidden"
+        />
+
+        <div
+          className={`${
+            showMenu ? "fixed w-full" : "h-0 w-0"
+          } md:hidden right-0 top-0 bottom-0 z-20 overflow-hidden bg-white transition-all`}
+        >
+          <div className="flex items-center justify-between px-5 py-6">
+            <img src={assets.logo} alt="logo" className="w-36" />
+            <img
+              src={assets.cross_icon}
+              alt="cross-icon"
+              onClick={() => setShowMenu(false)}
+              className="w-7"
+            />
+          </div>
+          <ul className="flex flex-col items-center gap-2 mt-5 px-5 text-lg font-medium">
+            <NavLink onClick={() => setShowMenu(false)} to="/">
+              <p className="px-4 py-2 rounded inline-block">Home</p>
+            </NavLink>
+            <NavLink onClick={() => setShowMenu(false)} to="/doctors">
+              <p className="px-4 py-2 rounded inline-block">All Doctors</p>
+            </NavLink>
+            <NavLink onClick={() => setShowMenu(false)} to="/about">
+              <p className="px-4 py-2 rounded inline-block">About</p>
+            </NavLink>
+            <NavLink onClick={() => setShowMenu(false)} to="/contact">
+              <p className="px-4 py-2 rounded inline-block">Contact</p>
+            </NavLink>
+          </ul>
+        </div>
       </div>
     </div>
   );
