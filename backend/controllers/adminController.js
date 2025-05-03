@@ -1,0 +1,153 @@
+import validator from "validator";
+import bcrypt from "bcrypt";
+import { v2 as cloudinary } from "cloudinary";
+import doctorModel from "../models/doctorModel.js";
+
+// validating strong password
+function isStrongPassword(password) {
+  if (password.length < 8) {
+    return {
+      valid: false,
+      message: "Password must be at least 8 characters long.",
+    };
+  }
+
+  if (!/[A-Z]/.test(password)) {
+    return {
+      valid: false,
+      message: "Password must include at least one uppercase letter.",
+    };
+  }
+
+  if (!/[a-z]/.test(password)) {
+    return {
+      valid: false,
+      message: "Password must include at least one lowercase letter.",
+    };
+  }
+
+  if (!/\d/.test(password)) {
+    return {
+      valid: false,
+      message: "Password must include at least one digit.",
+    };
+  }
+
+  if (!/[@$!%*?#&_]/.test(password)) {
+    return {
+      valid: false,
+      message:
+        "Password must include at least one special character (@$!%*?#&_).",
+    };
+  }
+
+  return { valid: true, message: "Password is strong." };
+}
+
+// Api for  adding doctor
+const addDoctor = async (req, res) => {
+  try {
+    const {
+      name,
+      email,
+      password,
+      speciality,
+      degree,
+      experience,
+      about,
+      fee,
+      address,
+    } = req.body;
+    const imageFile = req.file;
+
+    console.log(req.body); // Log body data
+    console.log(req.file);
+
+    // checking for all data to add doctor
+    if (
+      !name ||
+      !email ||
+      !password ||
+      !speciality ||
+      !degree ||
+      !experience ||
+      !about ||
+      !fee ||
+      !address
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required",
+      });
+    }
+
+    // validating email format
+    if (!validator.isEmail(email)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid email address, Please enter a valid email id.",
+      });
+    }
+
+    // checking for password strength
+    const passwordCheck = isStrongPassword(password);
+    if (!passwordCheck.valid) {
+      return res.status(400).json({
+        success: false,
+        message: passwordCheck.message,
+      });
+    }
+
+    // hashing doctor password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // checking for image
+    if (!imageFile) {
+      return res.status(400).json({
+        success: false,
+        message: "Image file is required",
+      });
+    }
+
+    // upload img to cloudinary
+    const imageUpload = await cloudinary.uploader.upload(imageFile.path, {
+      resource_type: "image",
+    });
+    const imageUrl = imageUpload.secure_url;
+
+    const parsedAddress =
+      typeof address === "string" ? JSON.parse(address) : address;
+
+    const doctorData = {
+      name,
+      email,
+      image: imageUrl,
+      password: hashedPassword,
+      speciality,
+      degree,
+      experience,
+      about,
+      fee,
+      address: parsedAddress,
+      date: Date.now(),
+    };
+
+    const newDoctor = new doctorModel(doctorData);
+
+    await newDoctor.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Doctor added successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export { addDoctor };
