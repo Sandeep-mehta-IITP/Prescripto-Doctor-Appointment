@@ -61,10 +61,10 @@ const addDoctor = async (req, res) => {
     } = req.body;
     const imageFile = req.file;
 
-    console.log(req.body); // Log body data
-    console.log(req.file);
+    console.log("Request Body:", req.body);
+    console.log("Request File:", req.file);
 
-    // checking for all data to add doctor
+    // Check for all required fields
     if (
       !name ||
       !email ||
@@ -82,7 +82,7 @@ const addDoctor = async (req, res) => {
       });
     }
 
-    // validating email format
+    // Validate email format
     if (!validator.isEmail(email)) {
       return res.status(400).json({
         success: false,
@@ -90,7 +90,7 @@ const addDoctor = async (req, res) => {
       });
     }
 
-    // checking for password strength
+    // Check password strength
     const passwordCheck = isStrongPassword(password);
     if (!passwordCheck.valid) {
       return res.status(400).json({
@@ -99,11 +99,11 @@ const addDoctor = async (req, res) => {
       });
     }
 
-    // hashing doctor password
+    // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // checking for image
+    // Check for image
     if (!imageFile) {
       return res.status(400).json({
         success: false,
@@ -111,12 +111,15 @@ const addDoctor = async (req, res) => {
       });
     }
 
-    // upload img to cloudinary
+    // Upload image to Cloudinary
+    console.log("Uploading to Cloudinary...");
     const imageUpload = await cloudinary.uploader.upload(imageFile.path, {
       resource_type: "image",
     });
+    console.log("Cloudinary Response:", imageUpload);
     const imageUrl = imageUpload.secure_url;
 
+    // Parse address
     const parsedAddress =
       typeof address === "string" ? JSON.parse(address) : address;
 
@@ -134,8 +137,8 @@ const addDoctor = async (req, res) => {
       date: Date.now(),
     };
 
+    console.log("Saving doctor data:", doctorData);
     const newDoctor = new doctorModel(doctorData);
-
     await newDoctor.save();
 
     res.status(200).json({
@@ -143,7 +146,7 @@ const addDoctor = async (req, res) => {
       message: "Doctor added successfully",
     });
   } catch (error) {
-    console.log(error);
+    console.error("Error in addDoctor:", error.stack); // Log full error stack
     res.status(500).json({
       success: false,
       message: error.message,

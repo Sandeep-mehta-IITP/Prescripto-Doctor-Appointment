@@ -35,16 +35,6 @@ const specialties = [
   "Gynecologist",
   "Neurologist",
   "Gastroenterologist",
-  "Cardiologist",
-  "Urologist",
-  "Dentist",
-  "Psychiatrist",
-  "ENT Specialist",
-  "Oncologist",
-  "Nephrologist",
-  "Surgeon",
-  "Endocrinologist",
-  "Pulmonologist",
 ];
 
 const AddDoctor = () => {
@@ -93,26 +83,27 @@ const AddDoctor = () => {
       );
 
       //console log form data
-      formData.forEach((val, key) => {
-        console.log(`${key} : ${val}`);
-      });
+      // formData.forEach((val, key) => {
+      //   console.log(`${key} : ${val}`);
+      // });
 
-      console.log('Token:', aToken);
+      // console.log("Token:", aToken);
 
       const { data } = await axios.post(
         backendUrl + "/api/admin/add-doctor",
         formData,
-        { headers: { aToken } }
+        { headers: { Authorization: `Bearer ${aToken}` } }
       );
 
       if (data.success) {
-        toast.success(data.meassage)
+        toast.success(data.message);
       } else {
-        toast.error(data.meassage)
+        toast.error(data.message);
       }
-
-
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong while adding doctor.");
+    }
   };
 
   return (

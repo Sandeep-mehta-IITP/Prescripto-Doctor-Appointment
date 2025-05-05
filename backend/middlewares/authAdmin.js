@@ -4,7 +4,15 @@ import jwt from "jsonwebtoken";
 
 const authAdmin = async (req, res, next) => {
   try {
-    const { atoken } = req.headers;
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Unauthorized, missing token." });
+    }
+    const atoken = authHeader.split(" ")[1];
+
     if (!atoken) {
       res.status(401).json({
         success: false,
@@ -22,7 +30,6 @@ const authAdmin = async (req, res, next) => {
     }
 
     next();
-    
   } catch (error) {
     console.log(error);
     res.status(500).json({
