@@ -3,6 +3,7 @@ import { assets } from "../../assets/assets_admin/assets";
 import { toast } from "react-toastify";
 import { AdminContext } from "../../context/AdminContext";
 import axios from "axios";
+import { checkEmailExists } from "../../utils/checkEmail";
 
 const experienceOptions = [
   "No Experience",
@@ -36,32 +37,6 @@ const specialties = [
   "Neurologist",
   "Gastroenterologist",
 ];
-
-const checkEmailExists = async (email, backendUrl) => {
-  try {
-    const response = await axios.post(backendUrl + "/api/admin/check-email", {
-      email,
-    });
-    const { success, message } = response.data;
-
-    if (!success) {
-      toast.error(
-        message ||
-          "This email is already registered. Please use a different one."
-      );
-      return true; // email exists
-    }
-
-    return false; // email is available
-  } catch (error) {
-    console.error("Error checking email:", error.response?.data, error);
-    toast.error(
-      error.response?.data?.message ||
-        "Something went wrong while checking email."
-    );
-    return true; // safer to assume email is taken if error occurs
-  }
-};
 
 const AddDoctor = () => {
   const [specialtiy, setSpeciality] = useState("");
@@ -186,8 +161,8 @@ const AddDoctor = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 onBlur={async () => {
-                  if (email) {
-                    const exists = await checkEmailExists(email);
+                  if (email && backendUrl) {
+                    const exists = await checkEmailExists(email, backendUrl);
                     setEmailExists(exists);
                   }
                 }}
