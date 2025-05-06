@@ -180,7 +180,7 @@ const AddDoctor = () => {
               <input
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value.toLowerCase())}
                 onBlur={async () => {
                   if (email && backendUrl) {
                     const exists = await checkEmailExists(email, backendUrl);
