@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { AdminContext } from "../../context/AdminContext";
 import axios from "axios";
 import { checkEmailExists } from "../../utils/checkEmail";
+import { Eye, EyeOff } from "lucide-react";
 
 const experienceOptions = [
   "No Experience",
@@ -44,10 +45,6 @@ const AddDoctor = () => {
   const [experience, setExperience] = useState("");
   const [experienceOpen, setExperienceOpen] = useState(false);
   const [emailExists, setEmailExists] = useState(false);
-
-  const closeDropdown = () => setOpen(false);
-  const closeExperienceDropdown = () => setExperienceOpen(false);
-
   const [docImg, setDocImg] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -57,24 +54,31 @@ const AddDoctor = () => {
   const [degree, setDegree] = useState("");
   const [address1, setAddress1] = useState("");
   const [address2, setAddress2] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { backendUrl, aToken } = useContext(AdminContext);
 
+  const closeDropdown = () => setOpen(false);
+  const closeExperienceDropdown = () => setExperienceOpen(false);
+
   const addDocHandler = async (e) => {
     e.preventDefault();
+    setIsLoading(true); // Start loader
 
     try {
       if (!docImg) {
-        return toast.error("Please upload a document image before proceeding.");
+        toast.error("Please upload a document image before proceeding.");
+        return;
       }
 
       const exists = await checkEmailExists(email, backendUrl);
       if (exists) {
-        return; // email already exists, toast shown in checkEmailExists
+        return; // Email already exists, toast shown in checkEmailExists
       }
 
       const formData = new FormData();
-
       formData.append("image", docImg);
       formData.append("name", name);
       formData.append("email", email);
@@ -89,7 +93,6 @@ const AddDoctor = () => {
         JSON.stringify({ line1: address1, line2: address2 })
       );
 
-      //console log form data
       formData.forEach((val, key) => {
         console.log(`${key} : ${val}`);
       });
@@ -113,6 +116,8 @@ const AddDoctor = () => {
         error.response?.data?.message ||
           "Something went wrong while adding doctor."
       );
+    } finally {
+      setIsLoading(false); // Stop loader after API response
     }
   };
 
@@ -120,7 +125,13 @@ const AddDoctor = () => {
     <form onSubmit={addDocHandler} className="m-5 w-full">
       <p className="mb-3 text-lg font-medium">Add Doctor</p>
 
-      <div className="bg-white px-8 py-8 border border-gray-200 rounded w-full max-w-4xl max-h-[80vh] overflow-y-scroll">
+      <div className="bg-white px-8 py-8 border border-gray-200 rounded w-full max-w-4xl max-h-[80vh] overflow-y-scroll relative">
+        {isLoading && (
+          <div className="absolute inset-0  backdrop-blur-sm flex items-center justify-center z-30">
+            <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        )}
+
         <div className="flex items-center gap-4 mb-8 text-gray-500">
           <label htmlFor="doc-img">
             <img
@@ -135,7 +146,6 @@ const AddDoctor = () => {
             onChange={(e) => setDocImg(e.target.files[0])}
             hidden
           />
-
           <p className="text-zinc-600">
             Upload doctor <br /> picture
           </p>
@@ -172,36 +182,47 @@ const AddDoctor = () => {
               />
             </div>
 
-            <div className="flex-1 flex flex-col gap-1">
+            <div className="flex-1 flex flex-col gap-1 relative">
               <p className="text-gray-600 font-medium">Doctor Password</p>
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                onFocus={() => setIsPasswordFocused(true)}
+                onBlur={() => setIsPasswordFocused(false)}
                 placeholder="Enter Doctor Password"
                 className="border rounded px-3 py-2 bg-blue-50 text-gray-800 font-medium"
                 required
               />
+              {isPasswordFocused && (
+                <button
+                  type="button"
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    setShowPassword((prev) => !prev);
+                  }}
+                  className="absolute right-3 top-[38px] text-gray-500 cursor-pointer"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              )}
             </div>
 
             <div className="flex-1 flex flex-col gap-1 relative">
               <p className="text-gray-600 font-medium">Experience</p>
-
               <div
                 onClick={() => setExperienceOpen(!experienceOpen)}
-                className=" flex items-center justify-between border rounded px-3 py-2 bg-blue-50 text-gray-800 font-medium cursor-pointer"
+                className="flex items-center justify-between border rounded px-3 py-2 bg-blue-50 text-gray-800 font-medium cursor-pointer"
               >
                 {experience || "Select Experience"}
                 <img src={assets.dropdown_icon} alt="dropdown-icon" />
               </div>
-
               {experienceOpen && (
                 <>
                   <div
                     className="fixed inset-0 z-10"
                     onClick={closeExperienceDropdown}
                   ></div>
-
                   <div className="absolute top-full mt-1 w-full max-h-48 overflow-y-auto bg-white border rounded shadow z-20">
                     {experienceOptions.map((exp, idx) => (
                       <div
@@ -234,7 +255,6 @@ const AddDoctor = () => {
             </div>
           </div>
 
-          {/*-------Right Side---------*/}
           <div className="w-full lg:flex-1 flex flex-col gap-4">
             <div className="flex-1 flex flex-col gap-1 relative">
               <p className="text-gray-600 font-medium">Speciality</p>
@@ -245,14 +265,12 @@ const AddDoctor = () => {
                 {specialtiy || "Select Speciality"}
                 <img src={assets.dropdown_icon} alt="dropdown-icon" />
               </div>
-
               {open && (
                 <>
                   <div
                     className="fixed inset-0 z-10"
                     onClick={closeDropdown}
                   ></div>
-
                   <div className="absolute top-full mt-1 w-full max-h-48 overflow-y-auto bg-white border rounded shadow z-20">
                     {specialties.map((spec, idx) => (
                       <div
@@ -308,7 +326,7 @@ const AddDoctor = () => {
         <div className="flex-1 flex flex-col gap-1">
           <p className="mt-4 mb-2 text-gray-600 font-medium">About Doctor</p>
           <textarea
-            placeholder="Wrtie about doctor..."
+            placeholder="Write about doctor..."
             value={about}
             onChange={(e) => setAbout(e.target.value)}
             rows={5}
@@ -317,8 +335,14 @@ const AddDoctor = () => {
           />
         </div>
 
-        <button className="bg-primary px-10 py-3 mt-4 text-white rounded-full cursor-pointer">
-          Add Doctor
+        <button
+          type="submit"
+          className={`bg-primary px-10 py-3 mt-4 text-white rounded-full ${
+            isLoading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+          }`}
+          disabled={isLoading}
+        >
+          {isLoading ? "Adding..." : "Add Doctor"}
         </button>
       </div>
     </form>
