@@ -37,11 +37,38 @@ const specialties = [
   "Gastroenterologist",
 ];
 
+const checkEmailExists = async (email, backendUrl) => {
+  try {
+    const response = await axios.post(backendUrl + "/api/admin/check-email", {
+      email,
+    });
+    const { success, message } = response.data;
+
+    if (!success) {
+      toast.error(
+        message ||
+          "This email is already registered. Please use a different one."
+      );
+      return true; // email exists
+    }
+
+    return false; // email is available
+  } catch (error) {
+    console.error("Error checking email:", error.response?.data, error);
+    toast.error(
+      error.response?.data?.message ||
+        "Something went wrong while checking email."
+    );
+    return true; // safer to assume email is taken if error occurs
+  }
+};
+
 const AddDoctor = () => {
   const [specialtiy, setSpeciality] = useState("");
   const [open, setOpen] = useState(false);
   const [experience, setExperience] = useState("");
   const [experienceOpen, setExperienceOpen] = useState(false);
+  const [emailExists, setEmailExists] = useState(false);
 
   const closeDropdown = () => setOpen(false);
   const closeExperienceDropdown = () => setExperienceOpen(false);
@@ -66,6 +93,11 @@ const AddDoctor = () => {
         return toast.error("Please upload a document image before proceeding.");
       }
 
+      const exists = await checkEmailExists(email, backendUrl);
+      if (exists) {
+        return; // email already exists, toast shown in checkEmailExists
+      }
+
       const formData = new FormData();
 
       formData.append("image", docImg);
@@ -83,11 +115,11 @@ const AddDoctor = () => {
       );
 
       //console log form data
-      // formData.forEach((val, key) => {
-      //   console.log(`${key} : ${val}`);
-      // });
+      formData.forEach((val, key) => {
+        console.log(`${key} : ${val}`);
+      });
 
-      // console.log("Token:", aToken);
+      console.log("Token:", aToken);
 
       const { data } = await axios.post(
         backendUrl + "/api/admin/add-doctor",
@@ -101,8 +133,11 @@ const AddDoctor = () => {
         toast.error(data.message);
       }
     } catch (error) {
-      console.error(error);
-      toast.error("Something went wrong while adding doctor.");
+      console.error("Error adding doctor:", error.response?.data, error);
+      toast.error(
+        error.response?.data?.message ||
+          "Something went wrong while adding doctor."
+      );
     }
   };
 
@@ -150,6 +185,12 @@ const AddDoctor = () => {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                onBlur={async () => {
+                  if (email) {
+                    const exists = await checkEmailExists(email);
+                    setEmailExists(exists);
+                  }
+                }}
                 placeholder="Enter Doctor Email"
                 className="border rounded px-3 py-2 bg-blue-50 text-gray-800 font-medium"
                 required
@@ -173,9 +214,10 @@ const AddDoctor = () => {
 
               <div
                 onClick={() => setExperienceOpen(!experienceOpen)}
-                className="border rounded px-3 py-2 bg-blue-50 text-gray-800 font-medium cursor-pointer"
+                className=" flex items-center justify-between border rounded px-3 py-2 bg-blue-50 text-gray-800 font-medium cursor-pointer"
               >
                 {experience || "Select Experience"}
+                <img src={assets.dropdown_icon} alt="dropdown-icon" />
               </div>
 
               {experienceOpen && (
@@ -223,9 +265,10 @@ const AddDoctor = () => {
               <p className="text-gray-600 font-medium">Speciality</p>
               <div
                 onClick={() => setOpen(!open)}
-                className="border rounded px-3 py-2 bg-blue-50 text-gray-800 font-medium cursor-pointer"
+                className="flex items-center justify-between border rounded px-3 py-2 bg-blue-50 text-gray-800 font-medium cursor-pointer"
               >
                 {specialtiy || "Select Speciality"}
+                <img src={assets.dropdown_icon} alt="dropdown-icon" />
               </div>
 
               {open && (

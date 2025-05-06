@@ -157,24 +157,23 @@ const addDoctor = async (req, res) => {
 // API for the Admin Login
 const adminLogin = async (req, res) => {
   try {
-    
     const { email, password } = req.body;
 
-    if (email === process.env.ADMIN_EMAIL && password == process.env.ADMIN_PASSWORD) {
-
-      const token = jwt.sign(email+password, process.env.JWT_SECRET)
+    if (
+      email === process.env.ADMIN_EMAIL &&
+      password == process.env.ADMIN_PASSWORD
+    ) {
+      const token = jwt.sign(email + password, process.env.JWT_SECRET);
       res.status(200).json({
         success: true,
-        token
-      })
-
+        token,
+      });
     } else {
       return res.status(401).json({
         success: false,
         message: "Invalid credentials. Please check your email and password.",
       });
     }
-
   } catch (error) {
     console.log(error);
     res.status(500).json({
@@ -182,7 +181,41 @@ const adminLogin = async (req, res) => {
       message: error.message,
     });
   }
-}
+};
 
+// checking for email already exist or not
+const checkEmail = async (req, res) => {
+  try {
+    const { email } = req.body;
 
-export { addDoctor, adminLogin };
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is required",
+      });
+    }
+
+    const user = await doctorModel.findOne({ email });
+
+    if (!user) {
+      return res.status(200).json({
+        success: true,
+        message: "Email is available",
+      });
+    }
+
+    return res.status(400).json({
+      success: false,
+      message: "This email ID is already registered, please try another one.",
+    });
+    
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export { addDoctor, adminLogin, checkEmail };
