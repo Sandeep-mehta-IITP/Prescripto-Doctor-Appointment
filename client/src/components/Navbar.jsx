@@ -107,7 +107,7 @@ const Navbar = () => {
                 </p>
                 <p
                   onClick={() => {
-                    logOut;
+                    logOut();
                     setShowDropdown(false);
                   }}
                   className="hover:text-black cursor-pointer"

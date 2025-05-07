@@ -30,6 +30,7 @@ const registerUser = async (req, res) => {
       });
     }
 
+
     if (password !== confirmPassword) {
       return res.status(400).json({
         success: false,

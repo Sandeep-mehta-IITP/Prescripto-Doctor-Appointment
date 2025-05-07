@@ -1,8 +1,9 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { AppContext } from "../context/AppContext";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom"
 
 const Login = () => {
   const [state, setState] = useState("Sign Up");
@@ -16,6 +17,7 @@ const Login = () => {
   const [name, setName] = useState("");
 
   const { token, setToken, backendUrl } = useContext(AppContext);
+  const navigate = useNavigate()
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
@@ -26,11 +28,13 @@ const Login = () => {
           name,
           password,
           email,
+          confirmPassword,
         });
 
         if (data.success) {
           localStorage.setItem("token", data.token);
           setToken(data.token);
+          toast.success("Registration successful! 🎉");
         } else {
           toast.error(data.message);
         }
@@ -43,14 +47,24 @@ const Login = () => {
         if (data) {
           localStorage.setItem("token", data.token);
           setToken(data.token);
+          toast.success("Login successful! 👋");
         } else {
           toast.error(data.message);
         }
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(
+        error.response?.data?.message ||
+          "Something went wrong while registering user."
+      );
     }
   };
+
+  useEffect(() => {
+    if (token) {
+      navigate('/')
+    }
+  },[token])
 
   return (
     <form onSubmit={onSubmitHandler} className="min-h-[80vh] flex items-center">
@@ -84,7 +98,7 @@ const Login = () => {
             type="email"
             placeholder="example@gmail.com"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value.toLowerCase())}
             required
             className="border border-zinc-300 rounded w-full p-2 mt-1 text-gray-800 font-medium"
           />
