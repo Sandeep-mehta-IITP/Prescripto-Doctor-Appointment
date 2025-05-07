@@ -1,13 +1,21 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { assets } from "../assets/assets_frontend/assets.js";
 import { NavLink, useNavigate } from "react-router-dom";
+import { AppContext } from "../context/AppContext.jsx";
 
 const Navbar = () => {
   const navigate = useNavigate();
 
   const [showMenu, setShowMenu] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [token, setToken] = useState(true); // token ? login : logout
+  //const [token, setToken] = useState(true); // token ? login : logout
+
+  const {token, setToken} = useContext(AppContext)
+
+  const logOut = () => {
+    setToken(false)
+     localStorage.removeItem('token')                                                                       
+  }
 
   const toggleDropdown = (e) => {
     e.stopPropagation(); // Prevent event bubbling
@@ -99,7 +107,7 @@ const Navbar = () => {
                 </p>
                 <p
                   onClick={() => {
-                    setToken(false);
+                    logOut;
                     setShowDropdown(false);
                   }}
                   className="hover:text-black cursor-pointer"
