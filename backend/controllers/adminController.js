@@ -106,7 +106,6 @@ const addDoctor = async (req, res) => {
       message: "Doctor added successfully",
     });
   } catch (error) {
-    console.error("Error in addDoctor:", error.stack); // Log full error stack
     res.status(500).json({
       success: false,
       message: error.message,
