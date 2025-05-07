@@ -3,6 +3,7 @@ import { isStrongPassword } from "../utils/passwordStrength.js";
 import bcrypt from "bcrypt";
 import userModel from "../models/userModel.js";
 import jwt from "jsonwebtoken";
+import { v2 as cloudinary } from "cloudinary";
 
 // API to register user
 const registerUser = async (req, res) => {
@@ -149,10 +150,9 @@ const loginUser = async (req, res) => {
 // API to get user profile data
 const getUserProfile = async (req, res) => {
   try {
+    const { userId } = req;
 
-    const { userId } = req
-
-    const userData = await userModel.findById(userId).select('-password')
+    const userData = await userModel.findById(userId).select("-password");
 
     if (!userData) {
       return res.status(404).json({
@@ -165,9 +165,7 @@ const getUserProfile = async (req, res) => {
       success: true,
       message: "User data fetched successfully.",
       userData,
-
-    })
-
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({
@@ -177,4 +175,49 @@ const getUserProfile = async (req, res) => {
   }
 };
 
-export { registerUser, loginUser, getUserProfile };
+// API to update user profile
+const updateUserProfile = async (req, res) => {
+  try {
+    const { userId, name, phone, address, dob, gender } = req.body;
+    const imageFile = req.file;
+
+    if (!name || !phone || !address || !dob || !gender) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required.",
+      });
+    }
+
+    // Prepare update object
+    const updatedFields = {
+      name,
+      phone,
+      address: JSON.parse(address),
+      dob,
+      gender,
+    };
+
+    if (imageFile) {
+      const imageUpload = await cloudinary.uploader.upload(imageFile.path, {
+        resource_type: "image",
+      });
+
+      updatedFields.image = imageUpload.secure_url;
+    }
+
+    await userModel.findByIdAndUpdate(userId, updatedFields);
+
+    res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export { registerUser, loginUser, getUserProfile, updateUserProfile };
