@@ -1,19 +1,9 @@
-import React, { use, useState } from "react";
-import { assets } from "../assets/assets_frontend/assets";
+import React, { useContext, useState } from "react";
+import { AppContext } from "../context/AppContext";
 
 const MyProfile = () => {
-  const [userData, setUserData] = useState({
-    name: "Edward Vincent",
-    image: assets.profile_pic,
-    email: "richard@gmail.com",
-    phone: "75606460406",
-    address: {
-      line1: "Ridhi Sidhi",
-      line2: "Jaipur",
-    },
-    gender: "Male",
-    dob: "2000-01-20",
-  });
+  
+  const { userData, setUserData } = useContext(AppContext);
 
   const [isEdit, setIsEdit] = useState(false);
 
