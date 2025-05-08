@@ -181,21 +181,29 @@ const updateUserProfile = async (req, res) => {
     const { userId, name, phone, address, dob, gender } = req.body;
     const imageFile = req.file;
 
-    if (!name || !phone || !address || !dob || !gender) {
+    if (!userId) {
       return res.status(400).json({
         success: false,
-        message: "All fields are required.",
+        message: "User ID is required.",
       });
     }
 
-    // Prepare update object
-    const updatedFields = {
-      name,
-      phone,
-      address: JSON.parse(address),
-      dob,
-      gender,
-    };
+    const updatedFields = {};
+
+    if (name) updatedFields.name = name;
+    if (phone) updatedFields.phone = phone;
+    if (address) {
+      try {
+        updatedFields.address = JSON.parse(address);
+      } catch (err) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid address format. It should be a JSON string.",
+        });
+      }
+    }
+    if (dob) updatedFields.dob = dob;
+    if (gender) updatedFields.gender = gender;
 
     if (imageFile) {
       const imageUpload = await cloudinary.uploader.upload(imageFile.path, {
@@ -203,6 +211,13 @@ const updateUserProfile = async (req, res) => {
       });
 
       updatedFields.image = imageUpload.secure_url;
+    }
+
+    if (Object.keys(updatedFields).length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No fields provided to update.",
+      });
     }
 
     await userModel.findByIdAndUpdate(userId, updatedFields);
@@ -219,5 +234,6 @@ const updateUserProfile = async (req, res) => {
     });
   }
 };
+
 
 export { registerUser, loginUser, getUserProfile, updateUserProfile };
