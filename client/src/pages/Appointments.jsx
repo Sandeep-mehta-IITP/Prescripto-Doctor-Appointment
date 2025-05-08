@@ -1,8 +1,10 @@
 import React, { useEffect, useState, useContext } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 import { assets } from "../assets/assets_frontend/assets";
 import RelatedDoctors from "../components/RelatedDoctors";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 const Appointments = () => {
   const { docId } = useParams();
@@ -11,7 +13,9 @@ const Appointments = () => {
   const [slotIdx, setSlotIdx] = useState(0);
   const [slotTime, setSlotTime] = useState("");
 
-  const { doctors, currencySymbol } = useContext(AppContext);
+  const navigate = useNavigate();
+  const { doctors, currencySymbol, backendUrl, token, getDoctorsData } =
+    useContext(AppContext);
   const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
   const fetchDocInfo = async () => {
@@ -65,6 +69,57 @@ const Appointments = () => {
       }
 
       setDocSlots((prev) => [...prev, timeSlots]);
+    }
+  };
+
+  // book appointment
+  const bookAppointment = async () => {
+    if (!token) {
+      toast.warn("Please login to book an appointment.");
+      return navigate("/login");
+    }
+
+    const userId = JSON.parse(localStorage.getItem("user"))?._id;
+    if (!userId) {
+      toast.error("User not found.");
+      return;
+    }
+
+    try {
+      const date = docSlots[slotIdx][0].datetime;
+
+      let day = date.getDate();
+      let month = date.getMonth() + 1;
+      let year = date.getFullYear();
+
+      const slotDate = day + "-" + month + "-" + year;
+
+      if (!slotDate || !slotTime) {
+        toast.warn("Please select a date and time slot.");
+        return;
+      }
+
+      const { data } = await axios.post(
+        backendUrl + "/api/user/book-appointment",
+        { userId, docId, slotDate, slotTime },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (data.success) {
+        toast.success(data?.message);
+        getDoctorsData();
+        navigate("/my-appointments");
+      } else {
+        toast.error(data?.message);
+      }
+    } catch (error) {
+      console.error("Error booking appointment:", error.response?.data, error);
+      toast.error(
+        error.response?.data?.message ||
+          "Something went wrong while booking appointment."
+      );
     }
   };
 
@@ -170,7 +225,12 @@ const Appointments = () => {
               ))}
           </div>
 
-          <button className="bg-primary text-sm font-light text-white px-14 py-3 rounded-full my-6">Book an Appiontment</button>
+          <button
+            className="bg-primary text-sm font-light cursor-pointer text-white px-14 py-3 rounded-full my-6"
+            onClick={bookAppointment}
+          >
+            Book an Appiontment
+          </button>
         </div>
 
         {/**--------Listing Related Doctors---------------**/}
