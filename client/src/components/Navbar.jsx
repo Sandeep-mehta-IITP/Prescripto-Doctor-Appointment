@@ -57,7 +57,7 @@ const Navbar = () => {
         {token && userData ? (
           <div className="relative flex items-center gap-2 cursor-pointer group">
             <img
-              src={userData?.image}
+              src={userData?.image || assets.upload_icon}
               alt="profile-icon"
               className="w-10 rounded-full object-cover overflow-hidden"
               onClick={(e) => {
