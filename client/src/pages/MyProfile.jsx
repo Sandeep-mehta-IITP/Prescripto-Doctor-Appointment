@@ -2,24 +2,21 @@ import React, { useContext, useState } from "react";
 import { AppContext } from "../context/AppContext";
 
 const MyProfile = () => {
-  
   const { userData, setUserData } = useContext(AppContext);
 
   const [isEdit, setIsEdit] = useState(false);
 
-  const appointments = {
-    total: 15,
-    upcoming: 3,
-    cancelled: 2,
-  };
+  if (!userData || !userData.address) {
+    return <p>Loading profile...</p>;
+  }
 
   return (
     <div className="max-w-5xl mx-auto flex flex-col md:flex-row gap-10 p-4">
-      <div className="w-full md:w-2/3 flex flex-col gap-6 text-sm">
+      <div className="w-full flex flex-col gap-6 text-sm">
         <img
           src={userData.image}
           alt="user-img"
-          className="w-40 rounded-full object-cover overflow-hidden"
+          className="w-45 rounded-full object-cover overflow-hidden bg-gray-100"
         />
 
         {isEdit ? (
@@ -29,7 +26,7 @@ const MyProfile = () => {
             onChange={(e) =>
               setUserData((prev) => ({ ...prev, name: e.target.value }))
             }
-            className="bg-gray-50 text-3xl font-medium max-w-60 mt-4"
+            className="bg-gray-50 text-3xl font-medium max-w-60 mt-4 px-2 py-1"
           />
         ) : (
           <p className="font-medium text-3xl text-neutral-800 mt-4">
@@ -52,7 +49,7 @@ const MyProfile = () => {
                 onChange={(e) =>
                   setUserData((prev) => ({ ...prev, phone: e.target.value }))
                 }
-                className="bg-gray-50 max-w-52"
+                className="bg-gray-50 max-w-52 px-2 py-2"
               />
             ) : (
               <p className="text-blue-400">{userData.phone}</p>
@@ -62,26 +59,26 @@ const MyProfile = () => {
               <p>
                 <input
                   type="text"
-                  value={userData.address.line1}
+                  value={userData?.address?.line1}
                   onChange={(e) =>
                     setUserData((prev) => ({
                       ...prev,
                       address: { ...prev.address, line1: e.target.value },
                     }))
                   }
-                  className="bg-gray-50"
+                  className="bg-gray-50 px-2 py-2"
                 />
                 <br />
                 <input
                   type="text"
-                  value={userData.address.line2}
+                  value={userData?.address?.line2}
                   onChange={(e) =>
                     setUserData((prev) => ({
                       ...prev,
                       address: { ...prev.address, line2: e.target.value },
                     }))
                   }
-                  className="bg-gray-50"
+                  className="bg-gray-50 px-2 py-2"
                 />
               </p>
             ) : (
@@ -104,7 +101,7 @@ const MyProfile = () => {
                 onChange={(e) =>
                   setUserData((prev) => ({ ...prev, gender: e.target.value }))
                 }
-                className="max-w-33 bg-gray-100"
+                className="max-w-33 bg-gray-100 px-2 py-2"
               >
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
@@ -122,7 +119,7 @@ const MyProfile = () => {
                 onChange={(e) =>
                   setUserData((prev) => ({ ...prev, dob: e.target.value }))
                 }
-                className="max-w-28 bg-gray-100"
+                className="max-w-28 bg-gray-100 px-2 py-2"
               />
             ) : (
               <p className="text-gray-400">{userData.dob}</p>
@@ -146,28 +143,6 @@ const MyProfile = () => {
               Edit
             </button>
           )}
-        </div>
-      </div>
-
-      {/*--------Right section--------*/}
-      {/* Appointments Summary */}
-      <div className="w-full md:w-1/3 flex flex-col gap-4 mt-1 md:mt-73 text-sm">
-        <p className="text-neutral-500 underline text-center md:text-left">
-          APPOINTMENT SUMMARY
-        </p>
-        <div className="grid grid-cols-3 md:grid-cols-1 gap-4">
-          <div className="bg-gray-100 p-4 rounded-xl text-center shadow">
-            <p className="text-2xl font-bold">{appointments.total}</p>
-            <p className="text-sm text-gray-500">Total</p>
-          </div>
-          <div className="bg-green-100 p-4 rounded-xl text-center shadow">
-            <p className="text-2xl font-bold">{appointments.upcoming}</p>
-            <p className="text-sm text-green-600">Upcoming</p>
-          </div>
-          <div className="bg-red-100 p-4 rounded-xl text-center shadow">
-            <p className="text-2xl font-bold">{appointments.cancelled}</p>
-            <p className="text-sm text-red-500">Cancelled</p>
-          </div>
         </div>
       </div>
     </div>

@@ -12,7 +12,18 @@ const AppContextProvider = (props) => {
     localStorage.getItem("token") ? localStorage.getItem("token") : false
   );
 
-  const [userData, setUserData] = useState(false);
+  const [userData, setUserData] = useState({
+    name: "",
+    image: "",
+    email: "",
+    phone: "",
+    dob: "",
+    gender: "",
+    address: {
+      line1: "",
+      line2: "",
+    },
+  });
 
   const getDoctorsData = async () => {
     try {
@@ -43,7 +54,7 @@ const AppContextProvider = (props) => {
       });
 
       if (data.success) {
-        setUserData(data.userData);
+        setUserData((prev) => ({ ...prev, ...data.userData }));
       } else {
         toast.error(data.message);
       }
