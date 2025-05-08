@@ -138,7 +138,7 @@ const AddDoctor = () => {
 
       <div className="bg-white px-8 py-8 border border-gray-200 rounded w-full max-w-4xl max-h-[80vh] overflow-y-scroll relative">
         {isLoading && (
-          <div className="absolute inset-0  backdrop-blur-sm flex items-center justify-center z-30">
+          <div className="fixed inset-0 backdrop-blur-sm bg-white/30 flex items-center justify-center z-50">
             <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
           </div>
         )}

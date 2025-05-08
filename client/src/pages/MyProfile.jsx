@@ -64,7 +64,7 @@ const MyProfile = () => {
   return (
     <div className="max-w-5xl mx-auto flex flex-col md:flex-row gap-10 p-4">
       {loading && (
-        <div className="absolute inset-0  backdrop-blur-sm flex items-center justify-center z-30">
+        <div className="fixed inset-0 backdrop-blur-sm bg-white/30 flex items-center justify-center z-50">
           <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
         </div>
       )}

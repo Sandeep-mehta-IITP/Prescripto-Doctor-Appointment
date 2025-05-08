@@ -10,7 +10,7 @@ const Navbar = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   //const [token, setToken] = useState(true); // token ? login : logout
 
-  const {token, setToken} = useContext(AppContext)
+  const {token, setToken, userData} = useContext(AppContext)
 
   const logOut = () => {
     setToken(false)
@@ -54,12 +54,12 @@ const Navbar = () => {
       </ul>
 
       <div className="flex items-center gap-4">
-        {token ? (
+        {token && userData ? (
           <div className="relative flex items-center gap-2 cursor-pointer group">
             <img
-              src={assets.profile_pic}
+              src={userData?.image}
               alt="profile-icon"
-              className="w-8 rounded-full"
+              className="w-10 rounded-full object-cover overflow-hidden"
               onClick={(e) => {
                 if (window.innerWidth < 768) toggleDropdown(e); // Toggle only on mobile
               }}
