@@ -1,10 +1,61 @@
 import React, { useContext, useState } from "react";
 import { AppContext } from "../context/AppContext";
+import { assets } from "../assets/assets_frontend/assets";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const MyProfile = () => {
-  const { userData, setUserData } = useContext(AppContext);
+  const { userData, setUserData, token, backendUrl, userProfileData } =
+    useContext(AppContext);
 
   const [isEdit, setIsEdit] = useState(false);
+  const [image, setImage] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const updateUserProfileData = async (req, res) => {
+    setLoading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("name", userData.name);
+      formData.append("phone", userData.phone);
+      formData.append("gender", userData.gender);
+      formData.append("dob", userData.dob);
+      formData.append("address", JSON.stringify(userData.address));
+      formData.append("userId", userData._id);
+
+      image && formData.append("image", image);
+
+      const { data } = await axios.post(
+        backendUrl + "/api/user/update-profile",
+        formData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (data.success) {
+        toast.success(data.message);
+        await userProfileData();
+        setIsEdit(false);
+        setImage(false);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.error(
+        "Error updating  user profile data:",
+        error.response?.data,
+        error
+      );
+      toast.error(
+        error.response?.data?.message ||
+          "Something went wrong while updating user profile data."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (!userData || !userData.address) {
     return <p>Loading profile...</p>;
@@ -12,12 +63,45 @@ const MyProfile = () => {
 
   return (
     <div className="max-w-5xl mx-auto flex flex-col md:flex-row gap-10 p-4">
+      {loading && (
+        <div className="absolute inset-0  backdrop-blur-sm flex items-center justify-center z-30">
+          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      )}
       <div className="w-full flex flex-col gap-6 text-sm">
-        <img
-          src={userData.image}
-          alt="user-img"
-          className="w-45 rounded-full object-cover overflow-hidden bg-gray-100"
-        />
+        {isEdit ? (
+          <label htmlFor="image">
+            <div className="inline-block w-[180px] h-[180px] relative cursor-pointer">
+              {/* Image preview or user image */}
+              <img
+                src={image ? URL.createObjectURL(image) : userData.image}
+                alt="user-image"
+                className="w-full h-full rounded-full opacity-70 object-cover overflow-hidden bg-gray-100"
+              />
+
+              {/* Upload icon */}
+              <img
+                src={image ? "" : assets.upload_icon}
+                alt="upload-icon"
+                className="w-12 absolute rounded-full px-2 py-2 bottom-[33%] left-[38%] bg-gray-800"
+              />
+            </div>
+
+            {/* Hidden file input */}
+            <input
+              type="file"
+              id="image"
+              hidden
+              onChange={(e) => setImage(e.target.files[0])}
+            />
+          </label>
+        ) : (
+          <img
+            src={userData.image}
+            alt="user-img"
+            className="w-[180px] h-[180px] rounded-full object-cover overflow-hidden bg-gray-100"
+          />
+        )}
 
         {isEdit ? (
           <input
@@ -130,10 +214,15 @@ const MyProfile = () => {
         <div className="mt-10">
           {isEdit ? (
             <button
-              className="border border-primary px-8 py-2 rounded-full cursor-pointer hover:bg-primary hover:text-white hover:scale-105 transition-all duration-200"
-              onClick={() => setIsEdit(false)}
+              className={`border border-primary px-8 py-2 rounded-full ${
+                loading
+                  ? "opacity-50 cursor-not-allowed"
+                  : "cursor-pointer"
+              } hover:bg-primary hover:text-white hover:scale-105 transition-all duration-200`}
+              onClick={updateUserProfileData}
+              disabled={loading}
             >
-              Save Changes
+              {loading ? "Saving..." : "Save Changes"}
             </button>
           ) : (
             <button
