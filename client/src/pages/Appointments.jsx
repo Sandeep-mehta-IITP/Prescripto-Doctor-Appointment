@@ -7,7 +7,6 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
-
 const Appointments = () => {
   const { docId } = useParams();
   const [docInfo, setDocInfo] = useState(null);
@@ -59,12 +58,28 @@ const Appointments = () => {
           hour: "2-digit",
           minute: "2-digit",
         });
-        //add slot to array
 
-        timeSlots.push({
-          datetime: new Date(currentDate),
-          time: formattedTime,
-        });
+        let day = currentDate.getDate();
+        let month = currentDate.getMonth() + 1;
+        let year = currentDate.getFullYear();
+
+        const slotDate = day + "-" + month + "-" + year;
+        const slotTime = formattedTime;
+
+        const isSlotAvailable =
+          docInfo.slots_booked[slotDate] &&
+          docInfo.slots_booked[slotDate].includes(slotTime)
+            ? false
+            : true;
+
+        if (isSlotAvailable) {
+          //add slot to array
+
+          timeSlots.push({
+            datetime: new Date(currentDate),
+            time: formattedTime,
+          });
+        }
 
         // increment current time by 30 mins
         currentDate.setMinutes(currentDate.getMinutes() + 30);
@@ -82,9 +97,8 @@ const Appointments = () => {
     }
 
     const decoded = jwtDecode(token);
-   
+
     const userId = decoded.id;
-  
 
     if (!userId) {
       toast.error("User not found.");
@@ -99,10 +113,9 @@ const Appointments = () => {
       let year = date.getFullYear();
 
       const slotDate = day + "-" + month + "-" + year;
-    
 
-      // console.log("slotDate:", slotDate); 
-      // console.log("AppointmentDate (timestamp):", AppointmentDate); 
+      // console.log("slotDate:", slotDate);
+      // console.log("AppointmentDate (timestamp):", AppointmentDate);
 
       if (!slotDate || !slotTime) {
         toast.warn("Please select a date and time slot.");
