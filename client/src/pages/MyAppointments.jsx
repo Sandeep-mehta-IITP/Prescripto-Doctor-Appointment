@@ -78,6 +78,50 @@ const MyAppointments = () => {
     }
   };
 
+  const initPay = (order) => {
+    const options = {
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+      amount: order.amount,
+      currency: order.currency,
+      name: "Appointment payment",
+      description: "Appointment payment",
+      order_id: order.id,
+      receipt: order.receipt,
+      handler: async (response) => {
+        console.log(response);
+      },
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  };
+
+  const appointmentPaymentRazorpay = async (appointmentId) => {
+    try {
+      const { data } = await axios.post(
+        backendUrl + "/api/user/payment-razorpay",
+        { appointmentId },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (data.success) {
+        initPay(data.order);
+      }
+    } catch (error) {
+      console.error(
+        "Error appointment payment by razorpay:",
+        error.response?.data,
+        error
+      );
+      toast.error(
+        error.response?.data?.message ||
+          "Something went wrong while paying appointment fee via razorpay."
+      );
+    }
+  };
+
   useEffect(() => {
     if (token) {
       getAppointments();
@@ -122,7 +166,10 @@ const MyAppointments = () => {
             <div></div>
             <div className="flex flex-col gap-2 justify-end">
               {!item.cancelled && (
-                <button className="text-sm text-stone-500 text-center sm:min-w-48 border py-2 rounded cursor-pointer hover:bg-primary hover:text-white transition-all duration-300">
+                <button
+                  className="text-sm text-stone-500 text-center sm:min-w-48 border py-2 rounded cursor-pointer hover:bg-primary hover:text-white transition-all duration-300"
+                  onClick={() => appointmentPaymentRazorpay(item._id)}
+                >
                   Pay Online
                 </button>
               )}
