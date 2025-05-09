@@ -5,7 +5,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 const MyAppointments = () => {
-  const { backendUrl, token } = useContext(AppContext);
+  const { backendUrl, token, getDoctorsData } = useContext(AppContext);
   const [appointments, setAppointments] = useState([]);
   const months = [
     "Jan",
@@ -23,9 +23,11 @@ const MyAppointments = () => {
   ];
 
   const slotDateFormat = (slotDate) => {
-    const dateArray = slotDate.split('-')
-    return dateArray[0]+ " " +months[Number(dateArray[1])-1]+ " " +dateArray[2]
-  }
+    const dateArray = slotDate.split("-");
+    return (
+      dateArray[0] + " " + months[Number(dateArray[1]) - 1] + " " + dateArray[2]
+    );
+  };
 
   const getAppointments = async () => {
     try {
@@ -46,6 +48,32 @@ const MyAppointments = () => {
       toast.error(
         error.response?.data?.message ||
           "Something went wrong while fetching appointments data."
+      );
+    }
+  };
+
+  const cancelAppointment = async (appointmentId) => {
+    try {
+      const { data } = await axios.post(
+        backendUrl + "/api/user/cancel-appointment",
+        { appointmentId },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (data.success) {
+        toast.success(data.message);
+        getAppointments();
+        getDoctorsData();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.error("Error cancel appointment:", error.response?.data, error);
+      toast.error(
+        error.response?.data?.message ||
+          "Something went wrong while canceling appointment."
       );
     }
   };
@@ -93,12 +121,24 @@ const MyAppointments = () => {
 
             <div></div>
             <div className="flex flex-col gap-2 justify-end">
-              <button className="text-sm text-stone-500 text-center sm:min-w-48 border py-2 rounded cursor-pointer hover:bg-primary hover:text-white transition-all duration-300">
-                Pay Online
-              </button>
-              <button className="text-sm text-stone-500 text-center sm:min-w-48 border py-2 rounded cursor-pointer hover:bg-red-600 hover:text-white transition-all duration-300">
-                Cancel Appointment
-              </button>
+              {!item.cancelled && (
+                <button className="text-sm text-stone-500 text-center sm:min-w-48 border py-2 rounded cursor-pointer hover:bg-primary hover:text-white transition-all duration-300">
+                  Pay Online
+                </button>
+              )}
+              {!item.cancelled && (
+                <button
+                  className="text-sm text-stone-500 text-center sm:min-w-48 border py-2 rounded cursor-pointer hover:bg-red-600 hover:text-white transition-all duration-300"
+                  onClick={() => cancelAppointment(item._id)}
+                >
+                  Cancel Appointment
+                </button>
+              )}
+              {item.cancelled && (
+                <button className="sm:min-w-48 py-2 bg-red-500 opacity-80 text-white rounded-2xl cursor-not-allowed">
+                  Appointment cancelled
+                </button>
+              )}
             </div>
           </div>
         ))}
