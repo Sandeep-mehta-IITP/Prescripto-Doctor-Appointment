@@ -5,6 +5,8 @@ import { assets } from "../assets/assets_frontend/assets";
 import RelatedDoctors from "../components/RelatedDoctors";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
+
 
 const Appointments = () => {
   const { docId } = useParams();
@@ -79,7 +81,11 @@ const Appointments = () => {
       return navigate("/login");
     }
 
-    const userId = JSON.parse(localStorage.getItem("user"))?._id;
+    const decoded = jwtDecode(token);
+   
+    const userId = decoded.id;
+  
+
     if (!userId) {
       toast.error("User not found.");
       return;
@@ -93,11 +99,17 @@ const Appointments = () => {
       let year = date.getFullYear();
 
       const slotDate = day + "-" + month + "-" + year;
+    
+
+      // console.log("slotDate:", slotDate); 
+      // console.log("AppointmentDate (timestamp):", AppointmentDate); 
 
       if (!slotDate || !slotTime) {
         toast.warn("Please select a date and time slot.");
         return;
       }
+
+      // console.log("Request Body:", { userId, docId, slotDate, slotTime });
 
       const { data } = await axios.post(
         backendUrl + "/api/user/book-appointment",

@@ -29,9 +29,9 @@ const appointmentSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  AppointmentDate: {
+  date: {
     type: Number,
-    required: true,
+    default: Date.now,
   },
   cancelled: {
     type: Boolean,
