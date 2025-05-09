@@ -318,11 +318,37 @@ const bookAppointment = async (req, res) => {
     await newAppointment.save();
 
     // save new slots data in docData
-    await doctorModel.findByIdAndUpdate(docId, {slots_booked: slotsBooked });
+    await doctorModel.findByIdAndUpdate(docId, { slots_booked: slotsBooked });
 
     res.status(201).json({
       success: true,
       message: "Appointment booked successfully 🎉.",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// API to get user appointments for frontend my-appointment page
+const myAppointmentsData = async (req, res) => {
+  try {
+    const userId = req.userId; // ✅ get from middleware
+    if (!userId) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Unauthorized user." });
+    }
+
+    const appointments = await appointmentModel.find({ userId });
+
+    res.status(200).json({
+      success: true,
+      appointments,
+      message: "Appointments fetched successfully.",
     });
   } catch (error) {
     console.log(error);
@@ -339,4 +365,5 @@ export {
   getUserProfile,
   updateUserProfile,
   bookAppointment,
+  myAppointmentsData,
 };
