@@ -80,6 +80,33 @@ const AdminContextProvider = (props) => {
     }
   };
 
+  // cancel appointment
+  const adminCancelAppointment = async (appointmentId) => {
+    try {
+      const { data } = axios.post(
+        backendUrl + "/api/admin/cancel-appointment",
+        { appointmentId },
+        {
+          headers: { Authorization: `Bearer ${aToken}` },
+        }
+      );
+
+      if (data?.success) {
+        toast.success(data?.message);
+        getAllAppointments();
+      } else {
+        toast.error(data?.message);
+      }
+    } catch (error) {
+      console.log(error);
+      
+      toast.error(
+        error.response?.data?.message ||
+          "Something went wrong while cancelling appointment."
+      );
+    }
+  };
+
   const value = {
     aToken,
     setAToken,
@@ -90,6 +117,7 @@ const AdminContextProvider = (props) => {
     appointments,
     setAppointments,
     getAllAppointments,
+    adminCancelAppointment,
   };
 
   return (
