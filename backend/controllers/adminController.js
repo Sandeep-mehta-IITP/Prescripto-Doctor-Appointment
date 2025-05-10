@@ -4,6 +4,7 @@ import { v2 as cloudinary } from "cloudinary";
 import doctorModel from "../models/doctorModel.js";
 import jwt from "jsonwebtoken";
 import { isStrongPassword } from "../utils/passwordStrength.js";
+import appointmentModel from "../models/appointmentModel.js";
 
 // Api for  adding doctor
 const addDoctor = async (req, res) => {
@@ -167,7 +168,6 @@ const checkEmail = async (req, res) => {
       success: false,
       message: "This email ID is already registered, please try another one.",
     });
-    
   } catch (error) {
     console.log(error);
     res.status(500).json({
@@ -177,18 +177,14 @@ const checkEmail = async (req, res) => {
   }
 };
 
-
 // API to get all doctors list for admin pannel.
 const allDoctors = async (req, res) => {
   try {
-
-    const doctors = await doctorModel.find({}).select('-password') // removing pass from responce
+    const doctors = await doctorModel.find({}).select("-password"); // removing pass from responce
     res.status(200).json({
       success: true,
       doctors,
-    })
-
-
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({
@@ -196,6 +192,23 @@ const allDoctors = async (req, res) => {
       message: error.message,
     });
   }
-}
+};
 
-export { addDoctor, adminLogin, checkEmail, allDoctors };
+// API to get all appointments list
+const adminAppointmentsData = async (req, res) => {
+  try {
+    const appointments = await appointmentModel.find({});
+    res.status(200).json({
+      success: true,
+      appointments,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export { addDoctor, adminLogin, checkEmail, allDoctors, adminAppointmentsData };
