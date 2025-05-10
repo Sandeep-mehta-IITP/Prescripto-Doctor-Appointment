@@ -3,10 +3,12 @@ import { useContext } from "react";
 import { AppContext } from "../context/AppContext";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const MyAppointments = () => {
   const { backendUrl, token, getDoctorsData } = useContext(AppContext);
   const [appointments, setAppointments] = useState([]);
+  const navigate = useNavigate();
   const months = [
     "Jan",
     "Feb",
@@ -88,7 +90,32 @@ const MyAppointments = () => {
       order_id: order.id,
       receipt: order.receipt,
       handler: async (response) => {
-        console.log(response);
+        // console.log(response);
+
+        try {
+          const { data } = await axios.post(
+            backendUrl + "/api/user/verify-razorpay-payment",
+            response,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+
+          if (data.success) {
+            getAppointments();
+            navigate("/my-appointments");
+          }
+        } catch (error) {
+          console.error(
+            "Error verify razorpay payment:",
+            error.response?.data,
+            error
+          );
+          toast.error(
+            error.response?.data?.message ||
+              "Something went wrong while verifying payment."
+          );
+        }
       },
     };
 
@@ -165,7 +192,12 @@ const MyAppointments = () => {
 
             <div></div>
             <div className="flex flex-col gap-2 justify-end">
-              {!item.cancelled && (
+              {!item.cancelled && item.payment && (
+                <button className="sm:min-w-48 py-2 bg-green-500 opacity-80 text-white rounded-2xl cursor-not-allowed">
+                  Paid
+                </button>
+              )}
+              {!item.cancelled && !item.payment && (
                 <button
                   className="text-sm text-stone-500 text-center sm:min-w-48 border py-2 rounded cursor-pointer hover:bg-primary hover:text-white transition-all duration-300"
                   onClick={() => appointmentPaymentRazorpay(item._id)}
