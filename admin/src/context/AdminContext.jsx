@@ -10,6 +10,7 @@ const AdminContextProvider = (props) => {
   );
   const [doctors, setDoctors] = useState([]);
   const [appointments, setAppointments] = useState([]);
+  const [dashData, setDashData] = useState(false);
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -93,16 +94,38 @@ const AdminContextProvider = (props) => {
 
       if (data?.success) {
         toast.success(data?.message);
-       await getAllAppointments();
+        await getAllAppointments();
       } else {
         toast.error(data?.message);
       }
     } catch (error) {
       console.log(error);
-      
+
       toast.error(
         error.response?.data?.message ||
           "Something went wrong while cancelling appointment."
+      );
+    }
+  };
+
+  // dashboard data
+  const getDashData = async () => {
+    try {
+      const { data } = await axios.get(backendUrl + "/api/admin/dashboard", {
+        headers: { Authorization: `Bearer ${aToken}` },
+      });
+
+      if (data?.success) {
+        setDashData(data.dashData);
+      } else {
+        toast.error(data?.message);
+      }
+    } catch (error) {
+      console.log(error);
+
+      toast.error(
+        error.response?.data?.message ||
+          "Something went wrong while fetching dashboard data."
       );
     }
   };
@@ -118,6 +141,8 @@ const AdminContextProvider = (props) => {
     setAppointments,
     getAllAppointments,
     adminCancelAppointment,
+    dashData,
+    getDashData,
   };
 
   return (
