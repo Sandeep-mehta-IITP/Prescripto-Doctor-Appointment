@@ -1,8 +1,35 @@
-import React from 'react'
+import { useContext, useEffect } from 'react'
+import { DoctorContext } from '../../context/DoctorContext'
 
 const DoctorAppointment = () => {
+
+  const { dToken, appointments, getAppointments } = useContext(DoctorContext);
+
+  useEffect(() => {
+    if (dToken) {
+      getAppointments()
+    }
+  }, [dToken])
+
   return (
-    <div>DoctorAppointment</div>
+    <div className='w-full max-w-6xl m-5'>
+      <p className='mb-3 text-lg font-medium'>All Appointments</p>
+
+      <div className='bg-white border border-gray-200 rounded text-sm max-h-[80vh] min-h-[50vh] overscroll-y-scroll'>
+
+        <div className='max-sm:hidden grid grid-cols-[0.5fr_2fr_1fr_1fr_3fr_1fr_1fr] gap-1 py-3 px-6 border-b border-gray-300'>
+          <p>#</p>
+          <p>Patient</p>
+          <p>Payment</p>
+          <p>Age</p>
+          <p>Date & Time</p>
+          <p>Fee</p>
+          <p>Action</p>
+        </div>
+
+
+      </div>
+    </div>
   )
 }
 
