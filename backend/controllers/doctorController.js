@@ -111,7 +111,7 @@ const appointmentComplete = async (req, res) => {
 
     if (appointmentData && appointmentData.docId === docId) {
       await appointmentModel.findByIdAndUpdate(appointmentId, {
-        isCompleted: true,
+        AppointmentCompleted: true,
       });
       return res.status(200).json({
         success: true,
