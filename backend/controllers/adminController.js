@@ -5,6 +5,7 @@ import doctorModel from "../models/doctorModel.js";
 import jwt from "jsonwebtoken";
 import { isStrongPassword } from "../utils/passwordStrength.js";
 import appointmentModel from "../models/appointmentModel.js";
+import userModel from "../models/userModel.js";
 
 // Api for  adding doctor
 const addDoctor = async (req, res) => {
@@ -247,6 +248,33 @@ const adminCancelAppointment = async (req, res) => {
   }
 };
 
+// API to get dashboard data fro admin pannel
+const adminDashboard = async (req, res) => {
+  try {
+    const doctors = await doctorModel.find({});
+    const users = await userModel.find({});
+    const appointments = await appointmentModel.find({});
+
+    const dashData = {
+      doctors: doctors.length,
+      appointments: appointments.length,
+      patients: users.length,
+      latestAppointments: appointments.reverse().slice(0, 5),
+    };
+
+    res.status(200).json({
+      success: true,
+      dashData,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 export {
   addDoctor,
   adminLogin,
@@ -254,4 +282,5 @@ export {
   allDoctors,
   adminAppointmentsData,
   adminCancelAppointment,
+  adminDashboard,
 };

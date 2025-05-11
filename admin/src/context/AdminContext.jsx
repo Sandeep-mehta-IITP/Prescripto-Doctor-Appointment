@@ -83,7 +83,7 @@ const AdminContextProvider = (props) => {
   // cancel appointment
   const adminCancelAppointment = async (appointmentId) => {
     try {
-      const { data } = axios.post(
+      const { data } = await axios.post(
         backendUrl + "/api/admin/cancel-appointment",
         { appointmentId },
         {
@@ -93,7 +93,7 @@ const AdminContextProvider = (props) => {
 
       if (data?.success) {
         toast.success(data?.message);
-        getAllAppointments();
+       await getAllAppointments();
       } else {
         toast.error(data?.message);
       }

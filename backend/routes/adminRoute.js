@@ -3,6 +3,7 @@ import {
   addDoctor,
   adminAppointmentsData,
   adminCancelAppointment,
+  adminDashboard,
   adminLogin,
   allDoctors,
   checkEmail,
@@ -20,6 +21,7 @@ adminRouter.post("/all-doctors", authAdmin, allDoctors);
 adminRouter.post("/change-availablity", authAdmin, changeAvailablity);
 adminRouter.get("/appointments", authAdmin, adminAppointmentsData);
 adminRouter.post("/cancel-appointment", authAdmin, adminCancelAppointment);
+adminRouter.get("/dashboard", authAdmin, adminDashboard);
 
 export default adminRouter;
 
