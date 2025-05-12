@@ -35,8 +35,18 @@ const RelatedDoctors = ({ docId, speciality }) => {
             <img src={item.image} alt="doctor-img" className="bg-blue-50" />
             <div className="p-4">
               <div className="flex items-center gap-2 text-sm text-center text-green-500">
-                <p className="w-2 h-2 bg-green-600 rounded-full"></p>
-                <p>Available</p>
+                <p
+                  className={`w-2 h-2 ${
+                    item.available ? "bg-green-600" : "bg-red-600"
+                  }  rounded-full`}
+                ></p>
+                <p
+                  className={`${
+                    item.available ? "text-green-600" : "text-red-600"
+                  }`}
+                >
+                  {item.available ? "Available" : "Unavailable"}
+                </p>
               </div>
               <p className="text-gray-900 text-lg font-medium">{item.name}</p>
               <p className="text-gray-600 text-sm">{item.speciality}</p>
