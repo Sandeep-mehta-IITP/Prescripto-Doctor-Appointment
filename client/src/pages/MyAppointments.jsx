@@ -192,20 +192,24 @@ const MyAppointments = () => {
 
             <div></div>
             <div className="flex flex-col gap-2 justify-end">
-              {!item.cancelled && item.payment && (
-                <button className="sm:min-w-48 py-2 bg-green-500 opacity-80 text-white rounded-2xl cursor-not-allowed">
-                  Paid
-                </button>
-              )}
-              {!item.cancelled && !item.payment && (
-                <button
-                  className="text-sm text-stone-500 text-center sm:min-w-48 border py-2 rounded cursor-pointer hover:bg-primary hover:text-white transition-all duration-300"
-                  onClick={() => appointmentPaymentRazorpay(item._id)}
-                >
-                  Pay Online
-                </button>
-              )}
-              {!item.cancelled && (
+              {!item.cancelled &&
+                item.payment &&
+                !item.AppointmentCompleted && (
+                  <button className="sm:min-w-48 py-2 bg-green-500 opacity-80 text-white rounded-2xl cursor-not-allowed">
+                    Paid
+                  </button>
+                )}
+              {!item.cancelled &&
+                !item.payment &&
+                !item.AppointmentCompleted && (
+                  <button
+                    className="text-sm text-stone-500 text-center sm:min-w-48 border py-2 rounded cursor-pointer hover:bg-primary hover:text-white transition-all duration-300"
+                    onClick={() => appointmentPaymentRazorpay(item._id)}
+                  >
+                    Pay Online
+                  </button>
+                )}
+              {!item.cancelled && !item.AppointmentCompleted && (
                 <button
                   className="text-sm text-stone-500 text-center sm:min-w-48 border py-2 rounded cursor-pointer hover:bg-red-600 hover:text-white transition-all duration-300"
                   onClick={() => cancelAppointment(item._id)}
@@ -213,11 +217,12 @@ const MyAppointments = () => {
                   Cancel Appointment
                 </button>
               )}
-              {item.cancelled && (
+              {item.cancelled && !item.AppointmentCompleted && (
                 <button className="sm:min-w-48 py-2 bg-red-500 opacity-80 text-white rounded-2xl cursor-not-allowed">
                   Appointment cancelled
                 </button>
               )}
+              {item.AppointmentCompleted && <button className="sm:min-w-48 py-2 bg-green-500/80 text-white rounded-2xl cursor-not-allowed">Completed</button>}
             </div>
           </div>
         ))}
