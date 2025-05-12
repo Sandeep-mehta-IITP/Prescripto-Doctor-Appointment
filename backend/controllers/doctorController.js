@@ -193,11 +193,55 @@ const getDoctorDashboard = async (req, res) => {
       latestAppointments: appointments.reverse().slice(0, 5),
     };
 
-
     res.status(200).json({
       success: true,
       dashData,
-    })
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// API to get doctor profile for docto pannel
+const doctorProfile = async (req, res) => {
+  try {
+    const docId = req.docId;
+    const profileData = await doctorModel.findById(docId).select("-password");
+
+    res.status(200).json({
+      success: true,
+      profileData,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// API to update the doctor profile data for doctor pannel
+const updateDoctorProfile = async (req, res) => {
+  try {
+    const docId = req.docId;
+    const { fee, address, available, about } = req.body;
+
+    await doctorModel.findByIdAndUpdate(docId, {
+      fee,
+      address,
+      available,
+      about,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Doctor profile updated successfully.",
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({
@@ -215,4 +259,6 @@ export {
   appointmentComplete,
   appointmentCancel,
   getDoctorDashboard,
+  doctorProfile,
+  updateDoctorProfile,
 };

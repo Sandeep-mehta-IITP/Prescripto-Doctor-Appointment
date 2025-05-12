@@ -63,11 +63,11 @@ const DoctorAppointment = () => {
             </p>
 
             {item.cancelled ? (
-              <p className="bg-red-400 px-2.5 py-1.5 rounded-2xl text-xs font-medium text-white">
+              <p className="bg-red-400 px-6 py-1.5 rounded-2xl text-xs font-medium text-white">
                 Cancelled
               </p>
             ) : item.AppointmentCompleted ? (
-              <p className="bg-green-400 px-2.5 py-1.5 rounded-2xl text-xs text-white font-medium">
+              <p className="bg-green-400 px-6 py-1.5 rounded-2xl text-xs text-white font-medium">
                 Completed
               </p>
             ) : (
