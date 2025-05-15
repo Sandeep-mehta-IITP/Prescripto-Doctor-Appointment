@@ -11,7 +11,7 @@ const Sidebar = () => {
   return (
     <div className="min-h-screen bg-white border-r">
       {aToken && (
-        <ul className="text-[#515151] mt-5">
+        <ul className="text-[#515151] mt-18">
           <NavLink
             to={"/admin-dashboard"}
             className={({ isActive }) =>
@@ -20,7 +20,11 @@ const Sidebar = () => {
               }`
             }
           >
-            <img src={assets.home_icon} alt="" />
+            <img
+              src={assets.home_icon}
+              alt="home-icon"
+              className="w-6 h-6 object-contain"
+            />
             <p className="hidden md:block">Dashboard</p>
           </NavLink>
 
@@ -32,7 +36,11 @@ const Sidebar = () => {
               }`
             }
           >
-            <img src={assets.appointment_icon} alt="" />
+            <img
+              src={assets.appointment_icon}
+              alt="appointment-icon"
+              className="w-6 h-6 object-contain"
+            />
             <p className="hidden md:block">Appointments</p>
           </NavLink>
 
@@ -44,7 +52,11 @@ const Sidebar = () => {
               }`
             }
           >
-            <img src={assets.add_icon} alt="" />
+            <img
+              src={assets.add_icon}
+              alt="add-icon"
+              className="w-6 h-6 object-contain"
+            />
             <p className="hidden md:block">Add Doctor</p>
           </NavLink>
 
@@ -56,14 +68,18 @@ const Sidebar = () => {
               }`
             }
           >
-            <img src={assets.people_icon} alt="" />
+            <img
+              src={assets.people_icon}
+              alt="people-icon"
+              className="w-6 h-6 object-contain"
+            />
             <p className="hidden md:block">Doctors List</p>
           </NavLink>
         </ul>
       )}
 
       {dToken && (
-        <ul className="text-[#515151] mt-5">
+        <ul className="text-[#515151] mt-18">
           <NavLink
             to={"/doctor-dashboard"}
             className={({ isActive }) =>
@@ -72,7 +88,11 @@ const Sidebar = () => {
               }`
             }
           >
-            <img src={assets.home_icon} alt="" />
+            <img
+              src={assets.home_icon}
+              alt="home-icon"
+              className="w-6 h-6 object-contain"
+            />
             <p className="hidden md:block">Dashboard</p>
           </NavLink>
 
@@ -84,11 +104,13 @@ const Sidebar = () => {
               }`
             }
           >
-            <img src={assets.appointment_icon} alt="" />
+            <img
+              src={assets.appointment_icon}
+              alt="appointment-icon"
+              className="w-6 h-6 object-contain"
+            />
             <p className="hidden md:block">Appointments</p>
           </NavLink>
-
-
 
           <NavLink
             to={"/doctor-profile"}
@@ -98,7 +120,11 @@ const Sidebar = () => {
               }`
             }
           >
-            <img src={assets.people_icon} alt="" />
+            <img
+              src={assets.people_icon}
+              alt="people-icon"
+              className="w-6 h-6 object-contain"
+            />
             <p className="hidden md:block">Profile</p>
           </NavLink>
         </ul>

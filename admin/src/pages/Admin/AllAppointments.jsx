@@ -15,7 +15,7 @@ const AllAppointments = () => {
   }, [aToken]);
 
   return (
-    <div className="w-full max-w-6xl m-5">
+    <div className="w-full max-w-6xl m-2 md:m-5">
       <p className="mb-3 text-lg font-medium">All Appointments</p>
 
       <div className="bg-white border border-blue-50 rounded  text-sm max-h-[80vh] min-h-[60vh] overflow-y-scroll">
