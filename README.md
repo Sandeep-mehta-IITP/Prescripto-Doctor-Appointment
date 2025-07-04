@@ -1,6 +1,6 @@
 <h1 align="center"> 🩺 Prescripto </h1>
 
-<p align="center">AI-Powered Doctor Appointment Booking Platform • Built with MERN Stack</p>
+<p align="center"> Doctor Appointment Booking Platform • Built with MERN Stack</p>
 
 <p align="center">
   <a href="https://imagify-frontend-qope.onrender.com" target="_blank"><strong>🌐 Live Demo</strong></a> |
